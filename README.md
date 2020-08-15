@@ -1,6 +1,8 @@
 # MazeBulderBot
 Телеграм бот, который создает лабиринт с введенными параметрами
 
+![GitHub Logo](/images/maze.png)
+
 Основная логика построения лабиринта находится в https://github.com/who-man-tech/MazeBuilder.git
 
 # Как это работает:
