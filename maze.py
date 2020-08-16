@@ -8,3 +8,9 @@ class Maze():
 
     def set_height(self, value: int):
         self.h = value
+    
+    def get_width(self):
+        return self.w
+    
+    def get_height(self):
+        return self.h
