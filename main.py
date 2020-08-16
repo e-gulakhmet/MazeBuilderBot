@@ -1,4 +1,5 @@
 import telebot
+import os
 
 import maze
 
@@ -7,7 +8,7 @@ import maze
 bot = telebot.TeleBot("1119904996:AAHv0-cvFUWbmAClT-wzG1xkpqOAka56RL8")
 
 # Инициализируем лабиринт
-mz = maze.Maze()
+mz = maze.Maze("/home/whoman/wrk/development/c++/MazeBuilder")
 
 # Создаем меню для управления ботом
 main_menu = telebot.types.ReplyKeyboardMarkup()
@@ -55,6 +56,8 @@ def reply(message):
 def callback(call):
     if call.data == "yes": # call.data это callback_data, которую мы указали при объявлении кнопки
         bot.send_message(call.message.chat.id, "Создаю лабиринт...")
+        mz.build_maze()
+        bot.send_photo(call.message.chat.id, os.path.join(os.getcwd(), "maze.bmp"))
     elif call.data == "no":
         bot.send_message(call.message.chat.id, "Измени нужные параметры и возвращайся")
 
