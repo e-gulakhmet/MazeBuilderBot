@@ -1,7 +1,11 @@
 import telebot
 import os
 
+
 import maze
+
+# TODO: Сделать отправку картинки лабиринта
+# TODO: Дабавить аргументы при запуске программы, которая строит лабиринт
 
 
 # Инициализируем телеграм бота
@@ -57,7 +61,8 @@ def callback(call):
     if call.data == "yes": # call.data это callback_data, которую мы указали при объявлении кнопки
         bot.send_message(call.message.chat.id, "Создаю лабиринт...")
         mz.build_maze()
-        bot.send_photo(call.message.chat.id, os.path.join(os.getcwd(), "maze.bmp"))
+        img = open("maze.bmp", 'rb')
+        bot.send_photo(call.message.chat.id, img)
     elif call.data == "no":
         bot.send_message(call.message.chat.id, "Измени нужные параметры и возвращайся")
 
