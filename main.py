@@ -4,7 +4,6 @@ import logging
 import maze
 
 
-# TODO: Убирать клавиатуру, когда она не нужна.
 # TODO: Добавить инструкцию по установке программы, котороя создает лабиринт
 # TODO: Добавить описание конечного продукта
 
@@ -65,6 +64,8 @@ def reply(message):
                           Верно?",
                          reply_markup=keyboard)
     else:
+        bot.send_message(message.chat.id, "Такой команды не существует.\n\
+                                           Выбери одну из доступных!")
         logger.warning("Unknown text message")
 
 
@@ -82,13 +83,13 @@ def callback(call):
         bot.send_message(call.message.chat.id, "Измени нужные параметры и возвращайся.")
     else:
         logger.warning("Unknown callback data")
-
+        
 
 def set_width(message):
     try:
         mz.set_width(int(message.text))
         logger.info("Width was changed")
-        bot.send_message(message.chat.id, "Ширина изменена.", reply_markup=main_menu)
+        bot.send_message(message.chat.id, "Ширина изменена.")
     except ValueError:
         bot.send_message(message.chat.id, "Значение должно быть больше 3,\n \
                                            Быть числом\n \
@@ -101,7 +102,7 @@ def set_height(message):
     try:
         mz.set_height(int(message.text))
         logger.info("Height was changed")
-        bot.send_message(message.chat.id, "Высота изменена.", reply_markup=main_menu)
+        bot.send_message(message.chat.id, "Высота изменена.")
     except ValueError:
         bot.send_message(message.chat.id, "Значение должно быть больше 3,\n \
                                            Быть числом\n \
