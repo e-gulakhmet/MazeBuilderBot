@@ -30,11 +30,19 @@ class Maze():
     def set_height(self, value: int):
         if value != int:
             self.logger.warning("Width must be integer")
+            return ValueError
         if value < 3:
             self.logger.warning("Height cannot be less than 3")
             return ValueError
         self.h = value
         self.logger.info("Height was set")
+    
+    def path(self, state):
+        if state != bool:
+            self.logger.warning("State must be boolean")
+            return ValueError
+        self.path = state
+        self.logger.info("Path state was set")
 
     def build_maze(self): # Построить лабиринт
         # Запускаем файл, который строит лабиринт и возращает картинку
@@ -44,9 +52,9 @@ class Maze():
         p = ""
         if (self.show_path):
             p = " -p "
-        os.system("./build/maze_builder -w " + str(self.w) + " -h " + str(self.h)
-                  + " -s " + str(self.start_cell) + " -f " + str(self.finish_cell)
-                  + " -r " + str(self.random_start_val) + p)
+        os.system("./build/maze_builder -w " + str(self.w) + " -h " + str(self.h) +
+                  + " -s " + str(self.start_cell) + " -f " + str(self.finish_cell) +
+                  + p)
         self.logger.info("Maze was created")
         time.sleep(2)
         os.chdir(dir)

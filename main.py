@@ -6,11 +6,14 @@ import maze
 
 # TODO: Добавить инструкцию по установке программы, котороя создает лабиринт
 # TODO: Добавить описание конечного продукта
+# TODO: Добавить все кнопки для настройки лабиринта
+# TODO: Прописать логику для всех кнопок настройки лабиринта
+# TODO: Добавить инлаин функции
 
 
 
 # Инициализируем logging
-logging.basicConfig(filename="bot.log", level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(filename="logging.log", level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("BOT")
 
 
@@ -23,7 +26,7 @@ mz = maze.Maze("/home/whoman/wrk/development/c++/MazeBuilder")
 
 # Создаем меню для управления ботом
 main_menu = telebot.types.ReplyKeyboardMarkup()
-main_menu.row("Ширина", "Высота")
+main_menu.row("Размеры", "Старт", "Финиш", "Подсвечивание пути")
 main_menu.row("Построить лабиринт")
 
 
@@ -40,31 +43,74 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def reply(message):
     logger.debug("Text message [" + message.text + "] has arrived")
-    if message.text == "Ширина":
+    if message.text == "Размеры":
+        # Выводим новую клавиатуру
+        size_menu = telebot.types.ReplyKeyboardMarkup()
+        size_menu.row("Ширина", "Высота")
+        size_menu.row("Вернуться")
+        bot.send_message(message.chat.id,
+                         "Выбери, какой параметр ты хочешь изменить.",
+                         reply_markup=size_menu)
+        logger.info("Size menu was opened")
+    elif message.text == "Ширина":
+        # Ожидаем ответа от пользователя,
+        # он должен ввести ширину лабиринта
         bot.send_message(message.chat.id, "Укажи ширину лабиринта...")
+        # Следующее присланное сообщение
+        # будет обработано в функции "set_width"
         bot.register_next_step_handler(message, set_width)
         logger.info("Waiting for the input of the width...")
     elif message.text == "Высота":
         bot.send_message(message.chat.id, "Укажи высоту лабиринта...")
         bot.register_next_step_handler(message, set_height)
         logger.info("Waiting for the input of the height...")
+    elif message.text == "Вернуться":
+        bot.send_message(message.chat.id, "Возвращаемся...", reply_markup=main_menu)
+        logger.info("Returned to the main menu")
+
+    elif message.text == "Старт":
+        bot.send_message(message.chat.id,
+                         "Стартовая ячейка всегда \
+                         находится на левой стороне.\n \
+                         Укажи её(отсчёт начинается сверху)")
+        bot.register_next_step_handler(message, set_start)
+        logger.info("Waiting for the input of the start cell...")
+    elif message.text == "Финиш":
+        bot.send_message(message.chat.id,
+                         "Ячейка финиша всегда \
+                         находится на правой стороне.\n \
+                         Укажи её(отсчёт начинается сверху)")
+        bot.register_next_step_handler(message, set_finish)
+        logger.info("Waiting for the input of the finish cell...")
+    elif message.text == "Подсвечивание пути":
+        # Создаем клавиатуру, которую затем прикрепим к сообщению
+        kboard = telebot.types.InlineKeyboardMarkup()
+        # Кнопки клавиатуры
+        k_yes = telebot.types.InlineKeyboardButton(text="Да", callback_data="path_yes")
+        k_no = telebot.types.InlineKeyboardButton(text="Нет", callback_data="path_no")
+        kboard.add(k_yes)
+        kboard.add(k_no)   
+        bot.send_message(message.chat.id,
+                         "Путь и ветвления будут подсвечиваться \n \
+                         Ты хочешь включить эту функцию?",
+                         reply_markup=kboard)
+        logger.info("Waiting for the answer...")
     elif message.text == "Построить лабиринт":
         # Создаем клавиатуру, которую затем прикрепим к сообщению
-        keyboard = telebot.types.InlineKeyboardMarkup()
+        kboard = telebot.types.InlineKeyboardMarkup()
         # Кнопки клавиатуры
-        k_yes = telebot.types.InlineKeyboardButton(text="Да", callback_data="yes")
-        k_no = telebot.types.InlineKeyboardButton(text="Нет", callback_data="no")
-        keyboard.add(k_yes)
-        keyboard.add(k_no)
-        
+        k_yes = telebot.types.InlineKeyboardButton(text="Да", callback_data="maze_yes")
+        k_no = telebot.types.InlineKeyboardButton(text="Нет", callback_data="maze_no")
+        kboard.add(k_yes)
+        kboard.add(k_no)   
         bot.send_message(message.chat.id,
                          "Лабиринт будет создан со следующими параметрами:\n \
                           Ширина: " + str(mz.w) + "\n\
                           Высота: " + str(mz.h) + "\n\
                           Верно?",
-                         reply_markup=keyboard)
+                         reply_markup=kboard)
     else:
-        bot.send_message(message.chat.id, "Такой команды не существует.\n\
+        bot.send_message(message.chat.id, "Такой команды не существует.\n \
                                            Выбери одну из доступных!")
         logger.warning("Unknown text message")
 
@@ -72,15 +118,22 @@ def reply(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
     logger.debug("CallBack data from little keyboard is [" + call.data + "]")
-    if call.data == "yes": # call.data это callback_data, которую мы указали при объявлении кнопки
+    if call.data == "maze_yes": # call.data это callback_data, которую мы указали при объявлении кнопки
         bot.send_message(call.message.chat.id, "Создаю лабиринт...")
         mz.build_maze()
         logger.info("Maze was made")
         img = open("maze.bmp", 'rb')
         bot.send_photo(call.message.chat.id, img)
         logger.info("Maze photo was sent")
-    elif call.data == "no":
+    elif call.data == "maze_no":
         bot.send_message(call.message.chat.id, "Измени нужные параметры и возвращайся.")
+
+    elif call.data == "path_yes":
+        bot.send_message(call.message.chat.id, "Подсветка пути включена.")
+        maze.path(True)
+    elif call.data == "path_no":
+        bot.send_message(call.message.chat.id, "Путь подсвечиваться не будет.")
+
     else:
         logger.warning("Unknown callback data")
         
@@ -109,7 +162,15 @@ def set_height(message):
                                            Введи новое значение!")
         bot.register_next_step_handler(message, set_height)
         return
-    
+
+
+def set_start(message):
+    pass
+
+
+def set_finish(message):
+    pass
+
 
 
 bot.polling()
