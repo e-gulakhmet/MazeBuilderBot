@@ -163,16 +163,17 @@ def set_height(message):
 
 
 def set_start(message):
-    try:
-        mz.set_start_cell(int(message.text))
-        logger.info("Start cell was changed")
-        bot.send_message(message.chat.id, "Ячейка старта изменена.")
-    except ValueError:
+    if mz.set_start_cell(int(message.text)) is False:
         bot.send_message(message.chat.id, "Значение должно быть меньше \
-                                           высоты лабиринта " + mz.h + ",\n \
+                                           высоты лабиринта " + str(mz.h) + ",\n \
                                            и быть числом.\n \
                                            Введи новое значение!")
         bot.register_next_step_handler(message, set_start)
+        return
+
+    logger.info("Start cell was changed")
+    bot.send_message(message.chat.id, "Ячейка старта изменена.")
+
 
 
 def set_finish(message):
@@ -180,12 +181,14 @@ def set_finish(message):
         mz.set_finish_cell(int(message.text))
         logger.info("Finish cell was changed")
         bot.send_message(message.chat.id, "Ячейка финиша изменена.")
+        return
     except ValueError:
         bot.send_message(message.chat.id, "Значение должно быть меньше \
                                            высоты лабиринта " + mz.h + ", \n \
                                            и быть числом.\n \
                                            Введи новое значение!")
         bot.register_next_step_handler(message, set_finish)
+        return
 
 
 

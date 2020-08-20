@@ -20,32 +20,35 @@ class Maze():
     def set_width(self, value):
         if value != int:
             self.logger.warning("Width must be integer")
-            return ValueError
+            return False
         if value < 3:
             self.logger.warning("Width cannot be less than 3")
-            return ValueError
+            return False
         self.w = value
         self.logger.info("Width was set")
+        return True
 
     def set_height(self, value: int):
         if value != int:
             self.logger.warning("Width must be integer")
-            return ValueError
+            return False
         if value < 3:
             self.logger.warning("Height cannot be less than 3")
-            return ValueError
+            return False
         self.h = value
         self.logger.info("Height was set")
+        return True
 
     def set_start_cell(self, value: int):
         if value != int:
             self.logger.warning("Start cell must be integer")
-            return ValueError
+            return False
         if value < 0 or value > self.h:
             self.logger.warning("Start cell must be less than height of maze")
-            return ValueError
+            return False
         self.start_cell = value
         self.logger.info("Start cell was set")
+        return True
     
     def set_finish_cell(self, value: int):
         if value != int:
