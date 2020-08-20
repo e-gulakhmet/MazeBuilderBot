@@ -36,13 +36,35 @@ class Maze():
             return ValueError
         self.h = value
         self.logger.info("Height was set")
+
+    def set_start_cell(self, value: int):
+        if value != int:
+            self.logger.warning("Start cell must be integer")
+            return ValueError
+        if value < 0 or value > self.h:
+            self.logger.warning("Start cell must be less than height of maze")
+            return ValueError
+        self.start_cell = value
+        self.logger.info("Start cell was set")
     
+    def set_finish_cell(self, value: int):
+        if value != int:
+            self.logger.warning("Finish cell must be integer")
+            return ValueError
+        if value < 0 or value > self.h:
+            self.logger.warning("Finish cell must be less than height of maze")
+            return ValueError
+        self.finish_cell = value
+        self.logger.info("Finish cell was set")
+
     def path(self, state):
         if state != bool:
             self.logger.warning("State must be boolean")
             return ValueError
-        self.path = state
+        self.show_path = state
         self.logger.info("Path state was set")
+    
+
 
     def build_maze(self): # Построить лабиринт
         # Запускаем файл, который строит лабиринт и возращает картинку

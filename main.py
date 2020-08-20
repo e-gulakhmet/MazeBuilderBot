@@ -71,14 +71,14 @@ def reply(message):
     elif message.text == "Старт":
         bot.send_message(message.chat.id,
                          "Стартовая ячейка всегда \
-                         находится на левой стороне.\n \
+                         находится на левой стороне. \
                          Укажи её(отсчёт начинается сверху)")
         bot.register_next_step_handler(message, set_start)
         logger.info("Waiting for the input of the start cell...")
     elif message.text == "Финиш":
         bot.send_message(message.chat.id,
                          "Ячейка финиша всегда \
-                         находится на правой стороне.\n \
+                         находится на правой стороне. \
                          Укажи её(отсчёт начинается сверху)")
         bot.register_next_step_handler(message, set_finish)
         logger.info("Waiting for the input of the finish cell...")
@@ -130,7 +130,7 @@ def callback(call):
 
     elif call.data == "path_yes":
         bot.send_message(call.message.chat.id, "Подсветка пути включена.")
-        maze.path(True)
+        mz.path(True)
     elif call.data == "path_no":
         bot.send_message(call.message.chat.id, "Путь подсвечиваться не будет.")
 
@@ -148,7 +148,6 @@ def set_width(message):
                                            Быть числом\n \
                                            Введи новое значение!")
         bot.register_next_step_handler(message, set_width)
-        return
 
 
 def set_height(message):
@@ -161,15 +160,32 @@ def set_height(message):
                                            Быть числом\n \
                                            Введи новое значение!")
         bot.register_next_step_handler(message, set_height)
-        return
 
 
 def set_start(message):
-    pass
+    try:
+        mz.set_start_cell(int(message.text))
+        logger.info("Start cell was changed")
+        bot.send_message(message.chat.id, "Ячейка старта изменена.")
+    except ValueError:
+        bot.send_message(message.chat.id, "Значение должно быть меньше \
+                                           высоты лабиринта " + mz.h + ",\n \
+                                           и быть числом.\n \
+                                           Введи новое значение!")
+        bot.register_next_step_handler(message, set_start)
 
 
 def set_finish(message):
-    pass
+    try:
+        mz.set_finish_cell(int(message.text))
+        logger.info("Finish cell was changed")
+        bot.send_message(message.chat.id, "Ячейка финиша изменена.")
+    except ValueError:
+        bot.send_message(message.chat.id, "Значение должно быть меньше \
+                                           высоты лабиринта " + mz.h + ", \n \
+                                           и быть числом.\n \
+                                           Введи новое значение!")
+        bot.register_next_step_handler(message, set_finish)
 
 
 
