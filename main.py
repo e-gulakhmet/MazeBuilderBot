@@ -6,9 +6,8 @@ import maze
 
 # TODO: Добавить инструкцию по установке программы, котороя создает лабиринт
 # TODO: Добавить описание конечного продукта
-# TODO: Добавить все кнопки для настройки лабиринта
-# TODO: Прописать логику для всех кнопок настройки лабиринта
 # TODO: Добавить инлаин функции
+# TODO: Обновить описание лабиринта в перед его созданием
 
 
 
@@ -139,57 +138,79 @@ def callback(call):
         
 
 def set_width(message):
+    value = 0
     try:
-        mz.set_width(int(message.text))
-        logger.info("Width was changed")
-        bot.send_message(message.chat.id, "Ширина изменена.")
+        value = int(message.text)
     except ValueError:
-        bot.send_message(message.chat.id, "Значение должно быть больше 3,\n \
-                                           Быть числом\n \
-                                           Введи новое значение!")
+        logger.warning("Width must be integer")
+        bot.send_message(message.chat.id, "Значение должно быть числом.")
         bot.register_next_step_handler(message, set_width)
+        return
+
+    if mz.set_width(value) is False:
+        bot.send_message(message.chat.id, "Значение должно быть больше 3.")
+        bot.register_next_step_handler(message, set_width)
+        return
+
+    logger.info("Width was changed")
+    bot.send_message(message.chat.id, "Ширина изменена.")
+
 
 
 def set_height(message):
+    value = 0
     try:
-        mz.set_height(int(message.text))
-        logger.info("Height was changed")
-        bot.send_message(message.chat.id, "Высота изменена.")
+        value = int(message.text)
     except ValueError:
-        bot.send_message(message.chat.id, "Значение должно быть больше 3,\n \
-                                           Быть числом\n \
-                                           Введи новое значение!")
+        logger.warning("Height must be integer")
+        bot.send_message(message.chat.id, "Значение должно быть числом.")
         bot.register_next_step_handler(message, set_height)
+        return
+
+    if mz.set_height(value) is False:
+        bot.send_message(message.chat.id, "Значение должно быть больше 3.")
+        bot.register_next_step_handler(message, set_height)
+        return
+
+    logger.info("Height was changed")
+    bot.send_message(message.chat.id, "Высота изменена.")
+
 
 
 def set_start(message):
-    if mz.set_start_cell(int(message.text)) is False:
-        bot.send_message(message.chat.id, "Значение должно быть меньше \
-                                           высоты лабиринта " + str(mz.h) + ",\n \
-                                           и быть числом.\n \
-                                           Введи новое значение!")
+    value = 0
+    try:
+        value = int(message.text)
+    except ValueError:
+        logger.warning("Start cell must be integer")
+        bot.send_message(message.chat.id, "Значение должно быть числом.")
+        bot.register_next_step_handler(message, set_start)
+        return
+    if mz.set_start_cell(value) is False:
+        bot.send_message(message.chat.id, "Значение должно быть больше 0 и меньше высоты.")
         bot.register_next_step_handler(message, set_start)
         return
 
     logger.info("Start cell was changed")
-    bot.send_message(message.chat.id, "Ячейка старта изменена.")
-
+    bot.send_message(message.chat.id, "Стартовая ячейка изменена.")
 
 
 def set_finish(message):
+    value = 0
     try:
-        mz.set_finish_cell(int(message.text))
-        logger.info("Finish cell was changed")
-        bot.send_message(message.chat.id, "Ячейка финиша изменена.")
-        return
+        value = int(message.text)
     except ValueError:
-        bot.send_message(message.chat.id, "Значение должно быть меньше \
-                                           высоты лабиринта " + mz.h + ", \n \
-                                           и быть числом.\n \
-                                           Введи новое значение!")
+        logger.warning("Finish cell must be integer")
+        bot.send_message(message.chat.id, "Значение должно быть числом.")
+        bot.register_next_step_handler(message, set_finish)
+        return
+    if mz.set_finish_cell(value) is False:
+        bot.send_message(message.chat.id, "Значение должно быть больше 0 и меньше высоты.")
         bot.register_next_step_handler(message, set_finish)
         return
 
+    logger.info("Finish cell was changed")
+    bot.send_message(message.chat.id, "Ячейка финиша изменена.")
 
 
 bot.polling()

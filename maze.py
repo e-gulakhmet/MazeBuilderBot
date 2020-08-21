@@ -18,20 +18,15 @@ class Maze():
         self.logger = logging.getLogger("MAZE")
     
     def set_width(self, value):
-        if value != int:
-            self.logger.warning("Width must be integer")
-            return False
         if value < 3:
-            self.logger.warning("Width cannot be less than 3")
+            self.logger.warning("Width must be less than 3")
             return False
+
         self.w = value
         self.logger.info("Width was set")
         return True
 
-    def set_height(self, value: int):
-        if value != int:
-            self.logger.warning("Width must be integer")
-            return False
+    def set_height(self, value):
         if value < 3:
             self.logger.warning("Height cannot be less than 3")
             return False
@@ -39,10 +34,7 @@ class Maze():
         self.logger.info("Height was set")
         return True
 
-    def set_start_cell(self, value: int):
-        if value != int:
-            self.logger.warning("Start cell must be integer")
-            return False
+    def set_start_cell(self, value):
         if value < 0 or value > self.h:
             self.logger.warning("Start cell must be less than height of maze")
             return False
@@ -51,21 +43,17 @@ class Maze():
         return True
     
     def set_finish_cell(self, value: int):
-        if value != int:
-            self.logger.warning("Finish cell must be integer")
-            return ValueError
         if value < 0 or value > self.h:
             self.logger.warning("Finish cell must be less than height of maze")
-            return ValueError
+            return False
         self.finish_cell = value
         self.logger.info("Finish cell was set")
+        return True
 
     def path(self, state):
-        if state != bool:
-            self.logger.warning("State must be boolean")
-            return ValueError
         self.show_path = state
         self.logger.info("Path state was set")
+        return True
     
 
 
@@ -78,8 +66,8 @@ class Maze():
         if (self.show_path):
             p = " -p "
         os.system("./build/maze_builder -w " + str(self.w) + " -h " + str(self.h) +
-                  + " -s " + str(self.start_cell) + " -f " + str(self.finish_cell) +
-                  + p)
+                  " -s " + str(self.start_cell) + " -f " + str(self.finish_cell) +
+                  p)
         self.logger.info("Maze was created")
         time.sleep(2)
         os.chdir(dir)
