@@ -73,6 +73,6 @@ class Maze():
         os.chdir(dir)
         try:
             os.rename(os.path.join(self.mb_path, "maze.bmp"), os.path.join(os.getcwd(), "maze.bmp"))
-        except:
+        except FileNotFoundError:
             self.logger.error("Maze was not found")
         self.logger.info("Maze was moved to the current directory")

@@ -1,5 +1,6 @@
 import telebot
 import logging
+import re
 
 import maze
 
@@ -11,7 +12,7 @@ import maze
 
 
 # Инициализируем logging
-logging.basicConfig(filename="logging.log", level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(filename="logging.log", level=logging.INFO, format="%(asctime)s %(name)s [%(levelname)s] : %(message)s")
 logger = logging.getLogger("BOT")
 
 
@@ -27,6 +28,10 @@ main_menu = telebot.types.ReplyKeyboardMarkup()
 main_menu.row("Размеры", "Старт", "Финиш", "Подсвечивание пути")
 main_menu.row("Построить лабиринт")
 
+# Создаю регулярное выражение, которое будет 
+# реагировать на корректный ввод инлаин функций
+digits_pattern = re.compile(r'^[0-9]+ [0-9]+$', re.MULTILINE)
+
 
 # Если получили команду старт, то приветсвтвуем пользователя
 # и показываем ему графический интерфейс
@@ -34,6 +39,28 @@ main_menu.row("Построить лабиринт")
 def start(message):
     logger.info("Start message")
     bot.send_message(message.chat.id, "Укажи параметры лабиринта.", reply_markup=main_menu)
+
+
+@bot.inline_handler(lambda query: len(query.query) > 0)
+def query_text(query):
+    matches = re.match(digits_pattern, query.query)
+    try:
+        w, h = matches.group().split()
+        logger.info("Parameters was set from inline call")
+    # Вылавливаем ошибку, если вдруг юзер ввёл чушь
+    # или задумался после ввода первого числа
+    except AttributeError as ex:
+        return
+
+
+    mz.set_width(int(w))
+    mz.set_height(int(h))
+    mz.build_maze()
+    logger.info("Maze was built")
+    img = open("maze.bmp", 'rb')
+    bot.answer_inline_query(query.id, "test", cache_time=2147483646)
+    logger.info("Maze image was sent")
+
 
 
 # Если получили сообщение "Размер", то говорим пользователю, чтобы он
