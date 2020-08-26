@@ -14,7 +14,7 @@ class Maze():
         self.start_cell = 3 # Стартовая ячейка
         self.finish_cell = 2 # Ячейка финиша
         self.random_start_val = 0 # Значения для рандомной последовательности
-        self.show_path = False # Показ пути и ответвлеий
+        self.path = False # Показ пути и ответвлеий
         self.logger = logging.getLogger("MAZE")
     
     def set_width(self, value):
@@ -51,7 +51,7 @@ class Maze():
         return True
 
     def path(self, state):
-        self.show_path = state
+        self.path = state
         self.logger.info("Path state was set")
         return True
     
@@ -63,7 +63,7 @@ class Maze():
         dir = os.getcwd()
         os.chdir(self.mb_path)
         p = ""
-        if (self.show_path):
+        if (self.path):
             p = " -p "
         os.system("./build/maze_builder -w " + str(self.w) + " -h " + str(self.h) +
                   " -s " + str(self.start_cell) + " -f " + str(self.finish_cell) +
@@ -71,5 +71,8 @@ class Maze():
         self.logger.info("Maze was created")
         time.sleep(2)
         os.chdir(dir)
-        os.rename(os.path.join(self.mb_path, "maze.bmp"), os.path.join(os.getcwd(), "maze.bmp"))
+        try:
+            os.rename(os.path.join(self.mb_path, "maze.bmp"), os.path.join(os.getcwd(), "maze.bmp"))
+        except:
+            self.logger.error("Maze was not found")
         self.logger.info("Maze was moved to the current directory")
