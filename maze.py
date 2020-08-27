@@ -7,7 +7,7 @@ import logging
 
 
 class Maze():
-    def __init__(self, maze_builder_path):
+    def __init__(self, maze_builder_path="/home/whoman/wrk/development/c++/MazeBuilder"):
         self.mb_path = maze_builder_path
         self.w = 6 # Ширина
         self.h = 6 # Высота

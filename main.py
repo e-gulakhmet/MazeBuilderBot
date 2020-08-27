@@ -2,14 +2,13 @@ import telebot
 import logging
 import re
 # import os
+import argparse
 
 import maze
 
 
 # TODO: Добавить инлаин функции
 # TODO: Добавить argparser
-# TODO: Обработать ошибки, связанные с запуском MazeBuider
-
 
 
 # Инициализируем logging
@@ -17,12 +16,20 @@ logging.basicConfig(filename="logging.log", level=logging.INFO, format="%(asctim
 logger = logging.getLogger("BOT")
 
 
+# Получаем аргументы, которые были переданы при запуске
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--path", default="")
+
+args = parser.parse_args()
+
+
+
 # Инициализируем телеграм бота
 bot = telebot.TeleBot("1119904996:AAHv0-cvFUWbmAClT-wzG1xkpqOAka56RL8")
 
 
 # Инициализируем лабиринт
-mz = maze.Maze("/home/whoman/wrk/development/c++/MazeBuilder")
+mz = maze.Maze(args.path)
 
 # Создаем меню для управления ботом
 main_menu = telebot.types.ReplyKeyboardMarkup()
@@ -32,6 +39,9 @@ main_menu.row("Построить лабиринт")
 # Создаю регулярное выражение, которое будет 
 # реагировать на корректный ввод инлаин функций
 inline_pattern = re.compile(r"^[0-50]+ [0-50]+ [0-50]+ [0-50]+ [0-1]+$", re.MULTILINE)
+
+
+
 
 
 # Если получили команду старт, то приветсвтвуем пользователя
@@ -81,7 +91,6 @@ def start(message):
 #     bot.answer_inline_query(query.id, [maze_info])
 #     bot.send_photo('1', img)
 #     logger.info("Sent maze image")
-
 
 
 # Если получили сообщение "Размер", то говорим пользователю, чтобы он
@@ -153,8 +162,8 @@ def reply(message):
                          "Лабиринт будет создан со следующими параметрами:\n \
                           Ширина: " + str(mz.w) + "\n\
                           Высота: " + str(mz.h) + "\n\
-                          Ячейка старта: " + str(mz.start) + "\n\
-                          Ячейка выхода: " + str(mz.finish) + "\n\
+                          Ячейка старта: " + str(mz.start_cell) + "\n\
+                          Ячейка выхода: " + str(mz.finish_cell) + "\n\
                           Подсвечивание пути и ветвлений: " + str(mz.path) + "\n\
                           Верно?",
                          reply_markup=kboard)
