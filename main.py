@@ -1,6 +1,7 @@
 import telebot
 import logging
 import re
+# import os
 
 import maze
 
@@ -30,7 +31,7 @@ main_menu.row("Построить лабиринт")
 
 # Создаю регулярное выражение, которое будет 
 # реагировать на корректный ввод инлаин функций
-digits_pattern = re.compile(r'^[0-9]+ [0-9]+$', re.MULTILINE)
+inline_pattern = re.compile(r"^[0-50]+ [0-50]+ [0-50]+ [0-50]+ [0-1]+$", re.MULTILINE)
 
 
 # Если получили команду старт, то приветсвтвуем пользователя
@@ -41,25 +42,45 @@ def start(message):
     bot.send_message(message.chat.id, "Укажи параметры лабиринта.", reply_markup=main_menu)
 
 
-@bot.inline_handler(lambda query: len(query.query) > 0)
-def query_text(query):
-    matches = re.match(digits_pattern, query.query)
-    try:
-        w, h = matches.group().split()
-        logger.info("Parameters was set from inline call")
-    # Вылавливаем ошибку, если вдруг юзер ввёл чушь
-    # или задумался после ввода первого числа
-    except AttributeError as ex:
-        return
+# @bot.inline_handler(lambda query: len(query.query) > 0)
+# def query_text(query):
+#     w, h, s, f, p = 0, 0, 0, 0, 0
+#     # Распределяем параметры, которые были написаны пользователем, по переменным
+#     inline_data = re.match(inline_pattern, query.query)
+#     try:
+#         w, h, s, f, p = inline_data.group().split()
+#         logger.info("Inline data was set")
+#     except AttributeError:
+#         logger.warning("Wrong data")
+#         return
+    
+#     print(w, h, s, f, p)
 
+#     # Устанавливаем параметры лабиринта и строем его
+#     mz.set_width(w)
+#     mz.set_height(h)
+#     mz.set_start_cell(s)
+#     mz.set_finish_cell(f)
+#     mz.path(p)
+#     img = open("maze.png", "rb")
+#     print(os.path.join(os.getcwd(), "maze.png"))
+#     # Создаю окошко над клавиатурой для общения с пользователем
+#     logger.info("Show maze info")
+#     maze_info = telebot.types.InlineQueryResultArticle(
+#         id='1', title="Параметры:",
+#         # Описание отображается в подсказке,
+#         # message_text - то, что будет отправлено в виде сообщения
+#         description="Ширина: {!s} \
+#             Высота: {!s} \
+#             Старт: {!s} \
+#             Финиш: {!s} \
+#             Путь: {!s}".format(w, h, s, f, p),
+#         input_message_content=telebot.types.InputTextMessageContent(
+#             message_text="Sending maze"))
 
-    mz.set_width(int(w))
-    mz.set_height(int(h))
-    mz.build_maze()
-    logger.info("Maze was built")
-    img = open("maze.bmp", 'rb')
-    bot.answer_inline_query(query.id, "test", cache_time=2147483646)
-    logger.info("Maze image was sent")
+#     bot.answer_inline_query(query.id, [maze_info])
+#     bot.send_photo('1', img)
+#     logger.info("Sent maze image")
 
 
 
