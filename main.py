@@ -8,7 +8,6 @@ import maze
 
 
 # TODO: Добавить инлаин функции
-# TODO: Добавить argparser
 
 
 # Инициализируем logging
